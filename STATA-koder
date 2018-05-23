@@ -1,0 +1,243 @@
+// /// IMPORT AF DATA FRA EXCEL \\\
+import excel "/Users/Joachimmoe/Downloads/data-27/BA - FÆRDIG DATA.xlsx", sheet("data") firstrow, 
+do "/var/folders/q4/rlwx26jx6p31kpt7zztm72r80000gp/T//SD28491.000000"
+
+/// **************************************** \\\
+/// **************************************** \\\
+///   AFSNIT 1 - DATAOPRYDNING & LABELS      \\\
+/// **************************************** \\\
+/// **************************************** \\\
+
+// inspektion af data
+codebook, tab(100)
+
+// Omdøber variable til ønskede variabelnavne
+rename covariate1 koen
+rename covariate2 alder
+rename introFRAME1 gruppecheck
+rename statusmanipulation1 treatment
+rename Nytforsog1 Gruppecheck2
+
+//blodtryksmålinger omdøbes
+rename maalingt11 SYS1
+rename maalingt12 DIA1
+rename maalingt21 SYS2
+rename maalingt22 DIA2
+rename maalingt32 DIA3
+rename maalingt31 SYS3
+
+// Samme for selvtillidsvariable 
+rename Rosenberg1 tilfredsselv
+rename Rosenberg2 ikkegodnok
+rename Rosenberg3 stolthed
+rename Rosenberg4 godsomandre
+
+rename CSE1 gladforgruppe
+rename CSE2 tilfredsstilgruppe
+rename CSE3 negativomdoemme
+rename CSE4 gruppeværdi
+
+// Definerer labels i vores variable
+label define KøN 1 "mand" 0 "kvinde" 
+label define likertskala 1 "Helt uenig" 2 "Delvist uenig" 3 "Hverken enig eller uenig" 4 "Delvist enig" 5 "Helt enig" 
+label define gruppetjek 1 "Kontrol-gruppen" 2 "Treatment-gruppen"
+label define treatment 1 "Treatment" 0 "Kontrol"
+label define Time 1 "Baseline" 2 "Statusmanipulation" 3 "Nyt forsøg"
+label define likertskala2 5 "Helt uenig" 4 "Delvist uenig" 3 "Hverken enig eller uenig" 2 "Delvist enig" 1 "Helt enig"
+
+// Vi tildeler dem values som defineret 
+// Vi husker at vende skalerne på variable, som er negative for at danne indeks 
+label values Time Time
+label values treatment treatment
+label values Gruppecheck2 gruppetjek
+
+label values tilfredsselv likertskala
+label values ikkegodnok likertskala
+label values stolthed likertskala2
+label values godsomandre likertskala
+
+label values gladforgruppe likertskala
+label values tilfredsstilgruppe likertskala
+label values negativomdoemme likertskala2
+label values gruppeværdi likertskala2
+
+
+// tildeler alle variable labels 
+label variable SYS1 "Blodtryk ved T1"
+label variable DIA1 "Dia blodtryk ved T2"
+label variable gruppecheck "Hvilken gruppe er bedst?"
+label variable koen "Hvilket køn er du?"
+label variable alder "Hvad er din alder i år?"
+label variable treatment "Hvilken gruppe kom du i?"
+label variable SYS2 "Blodtryk ved T2"
+label variable DIA2 "Dia blodtryk ved T2"
+label variable tilfredsselv "Tilfreds med sig selv"
+label variable ikkegodnok "Jeg er ikke god nok"
+label variable stolthed "Jeg har noget at være stolt af"
+label variable godsomandre "Jeg kan gøre ting godt som andre"
+label variable gladforgruppe "Er du glad for din gruppe?"
+label variable tilfredsstilgruppe "Det er tilfredsstillende at være en del af min gruppe"
+label variable negativomdoemme "Min gruppe er velanset"
+label variable gruppeværdi "Min gruppe har ikke nogen værdi"
+label variable Gruppecheck2 "Hvilkeng gruppe kom du i før?"
+label variable SYS3 "Blodtryk ved T3"
+label variable DIA3 "Dia blodtryk ved T3"
+label variable Køn "Hvilket køn er du?"
+
+// Tjekker, om alt er udført korrekt. 
+codebook, tab(100)
+
+
+// Genererer variable til graf for SYSTOLISK BLODTRYKSÆNDRINGER
+mean SYS1 if treatment == 1 //
+mean SYS2 if treatment == 1 // 
+mean SYS3 if treatment == 1 // 
+mean SYS1 if treatment == 0 // 
+mean SYS2 if treatment == 0 // 
+mean SYS3 if treatment == 0 // 
+
+gen Time = 1 & 2 & 3
+gen BlodtrykLAV = 1 & 2 & 3 
+replace BlodtrykLAV = 130.2 in 1
+replace BlodtrykLAV = 136.5333 in 2
+replace BlodtrykLAV = 129.7667 in 3
+
+gen BlodtrykHØJ = 1 & 2 & 3 
+replace BlodtrykHØJ = 129.8667 in 1
+replace BlodtrykHØJ = 128.4 in 2
+replace BlodtrykHØJ = 130.2667 in 3 
+
+// LAVER VARIABLE TIL MEAN ARTERIAL PRESSURE graf
+mean DIA1 if treatment == 1
+mean DIA2 if treatment == 1
+mean DIA3 if treatment == 1
+mean DIA1 if treatment == 0
+mean DIA2 if treatment == 0
+mean DIA3 if treatment == 0
+
+// Nu udregnes MAP med udgangspunkt i formlen angivet i opgaven
+//lavstatusgruppen
+di (0.66* 83.4) + (0.33*130.2) 
+di (0.66*84.6) + (0.33*136.5333)
+di (0.66*83.2667) + (0.33 * 129.7667) 
+
+//højstatusgruppen
+di (0.66*82.5333) + (0.33 * 129.8667) 
+di (0.66*78) + (0.33 * 128.4) 
+di (0.66*80.06667) + (0.33 * 130.2667) 
+
+// variabel til graf
+gen BlodtrykDIALAV = 1 & 2 & 3 
+replace BlodtrykMAP1LAV = 97.614 in 1
+replace BlodtrykMAP2LAV = 101.49199 in 2
+replace BlodtrykMAP3LAV = 97.640833 in 3 
+
+gen BlodtrykDIAHØJ = 1 & 2 & 3
+replace BlodtrykMAP1HØJ = 97.525 in 1
+replace BlodtrykMAP2HØJ = 93.984 in 2
+replace BlodtrykMAP3HØJ = 95.238 in 3 
+
+/// **************************************** \\\
+/// **************************************** \\\
+///   AFSNIT 2 - GRAFER & INDEKSKONSTRUKTION \\\
+/// **************************************** \\\
+/// **************************************** \\\
+
+
+// Graf over gns. blodtryksændringer 
+twoway connected BlodtrykLAV Time 
+twoway connected BlodtrykHØJ Time
+
+// Nu laver vi grafer for høje & lave identificerende subjekter 
+// Først splittes CSE-målet i to 
+mean CSEskala if treatment == 1 
+mean CSEskala if treatment == 0
+// Her er 1.5 grænsen for lavstatus og 1.75 grænsen for højstatus 
+
+
+mean SYS1 if treatment == 1 & CSEskala >1.5 
+mean SYS2 if treatment == 1 & CSEskala >1.5 
+mean SYS3 if treatment == 1 & CSEskala >1.5 
+********************************************************************
+mean SYS1 if treatment == 1 & CSEskala <1.5  
+mean SYS2 if treatment == 1 & CSEskala <1.5  
+mean SYS3 if treatment == 1 & CSEskala <1.5 
+
+************************HØJSTATUSGRUPPEN**************************
+mean SYS1 if treatment == 0 & CSEskala >1.75 
+mean SYS2 if treatment == 0 & CSEskala >1.75 
+mean SYS3 if treatment == 0 & CSEskala >1.75 
+********************************************************************
+mean SYS1 if treatment == 0 & CSEskala <1.75 
+mean SYS2 if treatment == 0 & CSEskala <1.75 
+mean SYS3 if treatment == 0 & CSEskala <1.75 
+
+// SAMME FOR MAP
+mean MAP1 if treatment == 1 & CSEskala >1.5 
+mean MAP2 if treatment == 1 & CSEskala >1.5 
+mean MAP3 if treatment == 1 & CSEskala >1.5
+********************************************************************
+mean MAP1 if treatment == 1 & CSEskala <1.5 
+mean MAP2 if treatment == 1 & CSEskala <1.5 
+mean MAP3 if treatment == 1 & CSEskala <1.5 
+
+************************HØJSTATUSGRUPPEN**************************
+mean MAP1 if treatment == 0 & CSEskala >1.75 
+mean MAP2 if treatment == 0 & CSEskala >1.75 
+mean MAP3 if treatment == 0 & CSEskala >1.75 
+********************************************************************
+mean MAP1 if treatment == 0 & CSEskala <1.75 
+mean MAP2 if treatment == 0 & CSEskala <1.75 
+mean MAP3 if treatment == 0 & CSEskala <1.75 
+
+// resultaterne indtastes i variablene SBTLAVhøjID og SBTHØJhøjID
+generate SBTLAVhøjID = . 
+generate SBTLAVlavID = .
+generate SBTHØJlavID = .
+generate SBTHØJhøjID = .
+// Her skal det beklages, at tallene er indtastes manuelt i disse variable og at derfor ikke er anvendt nogle koder til at forme disse variable. 
+// koderne er formegentlig blot:  
+
+** replace SBTLAVhøjID = resultat af mean SYS1 if CSEskala > 1.5 in 1 og så videre 
+** Ved simpelt at køre regnestykkerne kan disse koder altså nemt replikeres. 
+
+
+// Nu med indikator for kollektiv selvtillid // 
+twoway connected SBTLAVlavID Time || connected SBTLAVhøjID Time
+twoway connected SBTHØJlavID Time || connected SBTHØJhøjID Time
+// Nu med MAP-mål
+twoway connected MAPLAVlavID Time || connected MAPLAVhøjID Time
+twoway connected MAPHØJlavID Time || connected MAPHØJhøjID Time
+// Alle grafiske ændringer foretages i "GraphEditor"
+
+/// **************************************** \\\
+/// **************************************** \\\
+///   AFSNIT 3 - MANOVA's & INDICIER          \\\
+/// **************************************** \\\
+/// **************************************** \\\
+
+// Vi tjekker for between condition forskelle med en simpel t-test og Levenes-test for at se, om antagelsen om ens varians holder
+robvar SYS1, by(treatment)
+robvar MAP1, by(treatment)
+// Ser ganske fint ud - vi kan nu køre vores t-test
+ttest SYS1, by(treatment)
+ttest DIA1, by(treatment)
+
+// Udregner difference scores med formel: Baseline blood pressure level minus T2 T3 
+// Her skal det knyttes, at disse differencer er udregnet i excel, med deres automatiske funktioner. 
+
+// MANOVAS
+manova = treatment Time##c.ANOVAsysT2 Time##c.ANOVAsysT3
+manova = treatment Time##c.ANOVAMAPT2 Time##c.ANOVAMAPT3
+
+// ADDITIONAL MEASSURES // 
+// Da disse indeks allerede er oprettet for at lave graferne og analysen, laves nu nye indeks blot for at tjekke cronbachs alpha
+alpha ikkegodnok stolthed godsomandre tilfredsselv, gen(rosenbergskala1) 
+alpha gladforgruppe tilfredsstilgruppe, gen(CSEskala1) 
+
+// Parvise korrelationer -> lave og høje identificers // 
+bysort treatment: pwcorr SYS1 SYS2 CSEskala1, sig star(.05)
+bysort treatment: pwcorr SYS1 SYS3 CSEskala1, sig star(.05)
+bysort treatment: pwcorr MAP1 MAP2 CSEskala1, sig star(.05)
+bysort treatment: pwcorr MAP1 MAP3 CSEskala1, sig star(.05) 
+
