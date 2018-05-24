@@ -1,8 +1,8 @@
 # Koder i R # OBS: Det tager omtrent 5 minutter at simulere denne, så lad den blot køre
-Forventet.n <- seq(from=30, to=2000, by=50)     # Samplestørrelse
-Styrke <- rep(NA, length(Forventet.n))          # Matrice til at "store" estimater
-alpha <- 0.05                                   # sign. niveau
-sims <- 1000                                    # Antal sim for hvert N
+Forventet.n <- seq(from=30, to=2000, by=50)     
+Styrke <- rep(NA, length(Forventet.n))          
+alpha <- 0.05                                   
+sims <- 1000                                    
 
 #### YDRE LOPP ####
 for (j in 1:length(Forventet.n)){
@@ -14,7 +14,7 @@ for (j in 1:length(Forventet.n)){
   #### INDRE LOOP ####
   for (i in 1:sims){
     Y0 <-  rnorm(n=N, mean=60, sd=20)              
-    tau <- 5                                       # Effekt af lavstatusgruppe
+    tau <- 5                                       
     Y1 <- Y0 + tau                                 
     Z.sim <- rbinom(n=N, size=1, prob=.5)          
     Y.sim <- Y1*Z.sim + Y0*(1-Z.sim)               
