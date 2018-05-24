@@ -223,12 +223,16 @@ robvar MAP1, by(treatment)
 ttest SYS1, by(treatment)
 ttest DIA1, by(treatment)
 
+// T-tests
+ttest CSEskala, by(treatment)
+ttest rosenbergskala, by(treatment)
+
 // Udregner difference scores med formel: Baseline blood pressure level minus T2 T3 
 // Her skal det knyttes, at disse differencer er udregnet i excel, med deres automatiske funktioner. 
 
 // MANOVAS
-manova = treatment Time##c.ANOVAsysT2 Time##c.ANOVAsysT3
-manova = treatment Time##c.ANOVAMAPT2 Time##c.ANOVAMAPT3
+manova = treatment ANOVAsysT1 Time##c.ANOVAsysT2 Time##c.ANOVAsysT3
+manova = treatment ANOVAMAPT1 Time##c.ANOVAMAPT2 Time##c.ANOVAMAPT3
 
 // ADDITIONAL MEASSURES // 
 // Da disse indeks allerede er oprettet for at lave graferne og analysen, laves nu nye indeks blot for at tjekke cronbachs alpha
