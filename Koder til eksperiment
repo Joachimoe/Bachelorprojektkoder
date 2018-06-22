@@ -1,0 +1,72 @@
+# Bachelorprojektkoder
+Koder til både STATA og R. 
+
+bitmaps
+  Dias3
+  Dias4
+  korrekt
+  forkert
+  fixpoint
+  gulgul
+  gulgrøn
+  gukblå
+  gulrød
+  rødgul
+  rødgrøn
+  rødblå
+  rødrød
+  grøngul
+  grøngrøn
+  grønblå
+  grønrød
+  blågul
+  blågrøn
+  blåblå
+  blårød
+
+table stroop
+  "gul gul 1" yellowyellow 4
+  "gul groen  0" yellowgreen  2
+  "gul blå   0" yellowblue   3
+  "gul rød   0" yellowred    1
+  "rød gul    0" redyellow    4
+  "rød grøn     0" redgreen     2
+  "rød blå      0" redblue      3
+  "rød rød       1" redred       1
+  "grøn guk  0" greenyellow  4
+  "grøn grøn   1" greengreen   2
+  "grøn blå    0" greenblue    3
+  "grøn rød     0" greenred     1
+  "blå gul   0" blueyellow   4
+  "blå grøn    0" bluegreen    2
+  "blå blå     1" blueblue     3
+  "blå rød      0" bluered      1
+
+task stroop
+  table stroop
+  keys r g b y
+  delay 500
+  show bitmap fixpoint # stimulus 1
+  delay 200
+  clear 1 # remove fixpoint
+  delay 100
+  show bitmap @2 # stimulus 2
+  readkey @3 2000
+  clear 2 # remove stimulus 2
+  if STATUS == korrekt
+    show bitmap correct # stimulus 3 (feedback)
+  fi
+  if STATUS != korrekt  # stimulus 3 (feedback)
+    show bitmap forkert
+  fi
+  delay 500
+  clear 3 # remove feedback stimulus
+  save BLOCKNAME @1 TABLEROW KEY STATUS RT
+
+message Dias3
+
+message Dias4
+
+  tasklist
+    stroop 20  
+  end
